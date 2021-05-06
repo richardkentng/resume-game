@@ -1,4 +1,8 @@
 body {
-    background: rgb(53, 53, 53);
+    background: rgb(68, 68, 68);
+}
+
+.main-img {
+    max-width: 100%;
 }
 
