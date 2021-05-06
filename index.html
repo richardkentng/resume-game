@@ -10,7 +10,6 @@
 
 </head>
 <body>
-    
     <script>
         const width = 500
         const height = 500
@@ -47,6 +46,7 @@
         let icon_keys
 
         let gameOver = false
+        let justWon = false
         let inc = 0
         let clicks = 0
 
@@ -147,11 +147,14 @@
                 gameOver = true
                 sndPowerdown.play()
                 scene.physics.pause()
-                scene.add.text(10, 10, 'Game Over!', {fill: 'red', fontSize: '22px'})
-                scene.add.text(10, 34, 'You gave up hope!', {fill: 'red', fontSize: '22px'})
-                scene.add.text(10, 60, 'You stopped sending resumes!', {fill: 'red', fontSize: '22px'})
+                const fontStyle = {fill: 'red', fontSize: '22px', backgroundColor: 'black'}
+                scene.add.text(10, 10, 'Game Over!', fontStyle)
+                scene.add.text(10, 34, 'You gave up hope!', fontStyle)
+                scene.add.text(10, 65, 'You stopped sending', fontStyle)
+                scene.add.text(10, 89, 'resumes!', fontStyle)
+                scene.add.text(10, 120, 'Click to retry!', {fill: 'white', fontSize: '22px'})
                 icons.children.iterate(icon => {
-                    icon.disableBody(true, true)
+                    icon.setTint(0xff0000)
                 })
                 dude.anims.play('nohope', true)
             }
@@ -175,7 +178,12 @@
 
         function onPointerDown(scene) {
             scene.input.on('pointerdown', pointer => {
-                if (gameOver) return
+                if (gameOver) {
+                    if (!justWon) {
+                        location.reload()
+                    }
+                    return  
+                } 
 
                 sndBop.play()
                 inc = 0
@@ -192,9 +200,11 @@
                     let max = 200 - clicks
                     if (max < 4) max = 4
                     let rand = Math.floor(Math.random() * max)
-
+                    
                     if (rand === 3) {
                         gameOver = true
+                        justWon = true
+                        setTimeout(() => {justWon = false}, 1000)
 
                         sndDing.play()
                         sndWoohoo.play()
@@ -203,8 +213,10 @@
 
                         scene.physics.pause()
 
-                        scene.add.text(15, 15, 'You hard work paid off!', {fill: 'lime', fontSize: '32px'})
-                        scene.add.text(15, 40, 'Your resume was accepted!', {fill: 'lime', fontSize: '32px'})
+                        scene.add.text(15, 15, 'You hard work paid off!', {fill: 'lime', fontSize: '22px', backgroundColor: 'black'})
+                        scene.add.text(15, 40, 'Your resume was accepted!', {fill: 'lime', fontSize: '22px', backgroundColor: 'black'})
+                        scene.add.text(15, 67, 'Click to replay!', {fill: 'white', fontSize: '22px', backgroundColor: 'black'})
+
 
                         dude.anims.play('fistpump', true)
 
