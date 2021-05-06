@@ -37,17 +37,28 @@
         
         const game = new Phaser.Game(config)
         let dude
+        let target
+
         let cursors
+        let clientX
+        let clientY
 
         function preload() {
             cursors = this.input.keyboard.createCursorKeys()
 
-            this.load.spritesheet('dude', '/images/guy_typing_spritesheet_169_74_1.png', {frameWidth: 169, frameHeight: 74})
+            this.load.spritesheet('dude', './images/guy_typing_spritesheet_169_74_1.png', {frameWidth: 169, frameHeight: 74})
+            this.load.image('resume', './images/resume.png')
+            this.load.image('target', './images/target.png')
         }
         
         function create() {
             dude = this.add.sprite(cWidth, height - 35, 'dude')
 
+            target = this.add.image(0, 0, 'target')
+            target.destroy()
+
+            
+            //create animations for dude
             this.anims.create({
                 key: 'typing',
                 frames: this.anims.generateFrameNumbers('dude', {start: 0, end: 1}),
@@ -58,14 +69,37 @@
                 key: 'nohope',
                 frames: this.anims.generateFrameNumbers('dude', {start: 2, end: 2}),
             })
-
             dude.anims.play('typing', true)
 
+
+            //add event listeners
+            onMouseMove()
+            onPointerDown(this)
         }
         
-        function update() {
 
+        function update() {
+            //make (invisible) target follow pointer
+            target.x = clientX
+            target.y = clientY
         }
+
+
+        function onMouseMove() {
+            document.body.addEventListener('mousemove', (e) => {
+                clientX = e.clientX
+                clientY = e.clientY
+            })
+        }
+
+
+        function onPointerDown(scene) {
+            scene.input.on('pointerdown', pointer => {
+                const resume = scene.physics.add.image(dude.x, dude.y, 'resume')
+                resume.scene.physics.moveToObject(resume, target, 1000)
+            })
+        }
+        
     </script>
 </body>
 </html>
