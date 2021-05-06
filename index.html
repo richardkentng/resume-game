@@ -14,6 +14,39 @@
 </head>
 <body>
     <script>
+
+
+class HealthBar {
+    constructor (scene, x, y)
+    {
+        this.bar = new Phaser.GameObjects.Graphics(scene);
+
+        this.x = x;
+        this.y = y;
+        this.value = 100;
+        this.p = 76 / 100;
+
+        this.draw();
+
+        scene.add.existing(this.bar);
+    }
+
+    draw(num=1, denom=1)
+    {
+        this.bar.clear();
+
+        //  BG
+        this.bar.fillStyle(0xff0000);
+        this.bar.fillRect(this.x, this.y, width, 1);
+
+        // //  Health
+        this.bar.fillStyle(0x00804d);
+
+        const healthWidth = Math.floor(num / denom * width)
+        this.bar.fillRect(0, 0, healthWidth, 2);
+    }
+}
+
         const width = window.innerWidth
         const height = window.innerHeight
         const cWidth = width/2
@@ -36,8 +69,11 @@
                 }
             }
         }
+
+
         
         const game = new Phaser.Game(config)
+
         let dude
 
         let target
@@ -52,6 +88,8 @@
         let justWon = false
         let inc = 0
         let clicks = 0
+
+        let healthBar
 
         const sndPowerdown = new Audio('./audio/powerdown.wav')
         const sndSpit = new Audio('./audio/spit.m4a')
@@ -78,6 +116,8 @@
         }
         
         function create() {
+            healthBar = new HealthBar(this, 0, 0)
+
             dude = this.add.sprite(cWidth, height - 35, 'dude')
 
             target = this.add.image(0, 0, 'target')
@@ -100,7 +140,7 @@
                 const xPosStart = (Math.random() - 0.5 < 0) ? -25 : width + 25;
                 const xVel = (xPosStart === -25) ? Phaser.Math.Between(200, 400) : Phaser.Math.Between(-200, -400)
 
-                icon.enableBody(true, xPosStart, Phaser.Math.Between(25, height - 300), true, true)
+                icon.enableBody(true, xPosStart, Phaser.Math.Between(35, height - 200), true, true)
                 icon.body.setVelocityX(xVel)
             }, 100)
 
@@ -143,6 +183,9 @@
         }
 
         function checkActivity(scene) {
+            //visualize remaining time
+            healthBar.draw(500 - inc, 500)
+
             if (inc > 50) dude.anims.play('frozen', true)
             else {dude.anims.play('typing', true)}
 
