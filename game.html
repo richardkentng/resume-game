@@ -191,9 +191,11 @@ class HealthBar {
             //visualize remaining time
             healthBar.draw(500 - inc, 500)
 
+            //if player has not been clicking, make dude stop typing
             if (inc > 50) dude.anims.play('frozen', true)
             else {dude.anims.play('typing', true)}
 
+            //if there is no activity, game over!
             if (inc > 500) {
                 gameOver = true
                 sndPowerdown.play()
