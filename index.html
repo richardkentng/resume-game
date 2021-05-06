@@ -48,6 +48,7 @@
 
         let gameOver = false
         let inc = 0
+        let clicks = 0
 
         const sndPowerdown = new Audio('./audio/powerdown.wav')
         const sndSpit = new Audio('./audio/spit.m4a')
@@ -70,8 +71,7 @@
             this.load.image('netflix', './images/company_icons/netflix.png')
             this.load.image('google', './images/company_icons/google.png')
             this.load.image('mintbean', './images/company_icons/mintbean.png')
-            this.load.image('dropbox', './images/company_icons/dropbox.png')
-            icon_keys = ['facebook', 'apple', 'amazon', 'netflix', 'google', 'mintbean', 'dropbox']
+            icon_keys = ['facebook', 'apple', 'amazon', 'netflix', 'google', 'mintbean']
         }
         
         function create() {
@@ -147,7 +147,7 @@
                 gameOver = true
                 sndPowerdown.play()
                 scene.physics.pause()
-                scene.add.text(10, 10, 'You Lost!', {fill: 'red', fontSize: '22px'})
+                scene.add.text(10, 10, 'Game Over!', {fill: 'red', fontSize: '22px'})
                 scene.add.text(10, 34, 'You gave up hope!', {fill: 'red', fontSize: '22px'})
                 scene.add.text(10, 60, 'You stopped sending resumes!', {fill: 'red', fontSize: '22px'})
                 icons.children.iterate(icon => {
@@ -176,8 +176,11 @@
         function onPointerDown(scene) {
             scene.input.on('pointerdown', pointer => {
                 if (gameOver) return
+
                 sndBop.play()
                 inc = 0
+                clicks++
+
                 const resume = scene.physics.add.image(dude.x, dude.y, 'resume')
                 resume.scene.physics.moveToObject(resume, target, 1000)
 
@@ -185,19 +188,29 @@
                     const red = 0xff0000
                     const green = 0x00ff00
                     let tint = red
-                    let rand = Math.floor(Math.random() * 100)
+
+                    let max = 200 - clicks
+                    if (max < 4) max = 4
+                    let rand = Math.floor(Math.random() * max)
 
                     if (rand === 3) {
                         gameOver = true
+
                         sndDing.play()
                         sndWoohoo.play()
+
                         tint = green
+
                         scene.physics.pause()
+
                         scene.add.text(15, 15, 'You hard work paid off!', {fill: 'lime', fontSize: '32px'})
                         scene.add.text(15, 40, 'Your resume was accepted!', {fill: 'lime', fontSize: '32px'})
+
                         dude.anims.play('fistpump', true)
+
                     } else {
                         sndRip.play()
+
                         setTimeout(() => {
                             resume.destroy()
                             icon.destroy()
