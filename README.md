@@ -1,1 +1,1 @@
-# resume-game
+# Click [HERE](https://richardkentng.github.io/resume-game/) to checkout the game!
