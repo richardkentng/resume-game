@@ -37,18 +37,34 @@
         
         const game = new Phaser.Game(config)
         let dude
-        let target
 
+        let target
         let cursors
         let clientX
         let clientY
 
+        let icons
+        let icon_keys
+
+        let gameOver = false
+        let inc = 0
+
         function preload() {
             cursors = this.input.keyboard.createCursorKeys()
 
-            this.load.spritesheet('dude', './images/guy_typing_spritesheet_169_74_1.png', {frameWidth: 169, frameHeight: 74})
+            this.load.spritesheet('dude', './images/guy_typing_spritesheet_169_74_2.png', {frameWidth: 169, frameHeight: 74})
+
             this.load.image('resume', './images/resume.png')
             this.load.image('target', './images/target.png')
+
+            this.load.image('facebook', './images/company_icons/facebook.png')
+            this.load.image('apple', './images/company_icons/apple.png')
+            this.load.image('amazon', './images/company_icons/amazon.png')
+            this.load.image('netflix', './images/company_icons/netflix.png')
+            this.load.image('google', './images/company_icons/google.png')
+            this.load.image('mintbean', './images/company_icons/mintbean.png')
+            this.load.image('dropbox', './images/company_icons/dropbox.png')
+            icon_keys = ['facebook', 'apple', 'amazon', 'netflix', 'google', 'mintbean', 'dropbox']
         }
         
         function create() {
@@ -57,7 +73,27 @@
             target = this.add.image(0, 0, 'target')
             target.destroy()
 
-            
+            icons = this.physics.add.group()
+            for (let i = 0; i < 300; i++) {
+                icon_keys.forEach(key => {
+                    icons.create(0, 0, key)
+                })
+            }
+            icons.children.iterate(icon => {
+                icon.disableBody(true, true)
+            })
+
+            //spawn icons
+            setInterval(() => {
+                const icon = icons.getFirstDead(false)
+                
+                const xPosStart = (Math.random() - 0.5 < 0) ? -25 : width + 25;
+                const xVel = (xPosStart === -25) ? Phaser.Math.Between(200, 400) : Phaser.Math.Between(-200, -400)
+
+                icon.enableBody(true, xPosStart, Phaser.Math.Between(25, height - 300), true, true)
+                icon.body.setVelocityX(xVel)
+            }, 100)
+
             //create animations for dude
             this.anims.create({
                 key: 'typing',
@@ -68,6 +104,10 @@
             this.anims.create({
                 key: 'nohope',
                 frames: this.anims.generateFrameNumbers('dude', {start: 2, end: 2}),
+            })
+            this.anims.create({
+                key: 'fistpump',
+                frames: this.anims.generateFrameNumbers('dude', {start: 3, end: 3}),
             })
             dude.anims.play('typing', true)
 
@@ -82,8 +122,33 @@
             //make (invisible) target follow pointer
             target.x = clientX
             target.y = clientY
+
+            disableUnseenIcons()
+            if(!gameOver) checkActivity(this)
+            inc++
         }
 
+        function checkActivity(scene) {
+            if (inc > 1000) {
+                gameOver = true
+                scene.physics.pause()
+                scene.add.text(10, 10, 'You Lost!', {fill: 'red', fontSize: '22px'})
+                scene.add.text(10, 34, 'You gave up hope!', {fill: 'red', fontSize: '22px'})
+                scene.add.text(10, 60, 'You stopped sending resumes!', {fill: 'red', fontSize: '22px'})
+                icons.children.iterate(icon => {
+                    icon.disableBody(true, true)
+                })
+                dude.anims.play('nohope', true)
+            }
+        }
+
+        function disableUnseenIcons() {
+            icons.children.iterate(icon => {
+                if (icon.x < -50|| icon.x > width + 50)  {
+                    icon.disableBody(true, true)
+                }
+            })
+        }
 
         function onMouseMove() {
             document.body.addEventListener('mousemove', (e) => {
@@ -95,11 +160,39 @@
 
         function onPointerDown(scene) {
             scene.input.on('pointerdown', pointer => {
+                if (gameOver) return
+                inc = 0
                 const resume = scene.physics.add.image(dude.x, dude.y, 'resume')
                 resume.scene.physics.moveToObject(resume, target, 1000)
+
+                scene.physics.add.collider(resume, icons, function(resume, icon) {
+                    const red = 0xff0000
+                    const green = 0x00ff00
+                    let tint = red
+                    let rand = Math.floor(Math.random() * 100)
+
+                    if (rand === 3) {
+                        gameOver = true
+                        tint = green
+                        scene.physics.pause()
+                        scene.add.text(15, 15, 'You hard work paid off!', {fill: 'lime', fontSize: '32px'})
+                        scene.add.text(15, 40, 'Your resume was accepted!', {fill: 'lime', fontSize: '32px'})
+                        dude.anims.play('fistpump', true)
+                    } else {
+                        setTimeout(() => {
+                            resume.destroy()
+                            icon.destroy()
+                        }, 50)
+                    }
+                    resume.setTint(tint)
+                    icon.setTint(tint)
+
+                }, null, this)
             })
         }
-        
+
+
+
     </script>
 </body>
 </html>
