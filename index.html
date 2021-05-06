@@ -76,8 +76,6 @@ class HealthBar {
 
         let target
         let cursors
-        let clientX
-        let clientY
 
         let icons
         let icon_keys
@@ -160,17 +158,13 @@ class HealthBar {
 
 
             //add event listeners
-            onMouseMove()
             onPointerDown(this)
         }
         
 
         function update() {
-            //make (invisible) target follow pointer
-            target.x = clientX
-            target.y = clientY
-
             disableUnseenIcons()
+
             if(!gameOver) checkActivity(this)
             inc++
         }
@@ -225,13 +219,6 @@ class HealthBar {
             })
         }
 
-        function onMouseMove() {
-            document.body.addEventListener('mousemove', (e) => {
-                clientX = e.clientX
-                clientY = e.clientY
-            })
-        }
-
 
         function onPointerDown(scene) {
             scene.input.on('pointerdown', pointer => {
@@ -245,6 +232,10 @@ class HealthBar {
                 sndBop.play()
                 inc = 0
                 clicks++
+
+                //move target to pointer (resume aims toward target)
+                target.x = pointer.x
+                target.y = pointer.y
 
                 const resume = scene.physics.add.image(dude.x, dude.y, 'resume')
                 resume.scene.physics.moveToObject(resume, target, 1000)
