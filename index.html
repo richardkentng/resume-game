@@ -49,6 +49,13 @@
         let gameOver = false
         let inc = 0
 
+        const sndPowerdown = new Audio('./audio/powerdown.wav')
+        const sndSpit = new Audio('./audio/spit.m4a')
+        const sndBop = new Audio('./audio/bop.m4a')
+        const sndRip = new Audio('./audio/rip.wav')
+        const sndDing = new Audio('./audio/ding.wav')
+        const sndWoohoo = new Audio('./audio/woohoo.wav')
+
         function preload() {
             cursors = this.input.keyboard.createCursorKeys()
 
@@ -102,6 +109,10 @@
                 repeat: -1
             })
             this.anims.create({
+                key: 'frozen',
+                frames: this.anims.generateFrameNumbers('dude', {start: 0, end: 0}),
+            })
+            this.anims.create({
                 key: 'nohope',
                 frames: this.anims.generateFrameNumbers('dude', {start: 2, end: 2}),
             })
@@ -129,8 +140,12 @@
         }
 
         function checkActivity(scene) {
-            if (inc > 1000) {
+            if (inc > 50) dude.anims.play('frozen', true)
+            else {dude.anims.play('typing', true)}
+
+            if (inc > 500) {
                 gameOver = true
+                sndPowerdown.play()
                 scene.physics.pause()
                 scene.add.text(10, 10, 'You Lost!', {fill: 'red', fontSize: '22px'})
                 scene.add.text(10, 34, 'You gave up hope!', {fill: 'red', fontSize: '22px'})
@@ -161,6 +176,7 @@
         function onPointerDown(scene) {
             scene.input.on('pointerdown', pointer => {
                 if (gameOver) return
+                sndBop.play()
                 inc = 0
                 const resume = scene.physics.add.image(dude.x, dude.y, 'resume')
                 resume.scene.physics.moveToObject(resume, target, 1000)
@@ -173,12 +189,15 @@
 
                     if (rand === 3) {
                         gameOver = true
+                        sndDing.play()
+                        sndWoohoo.play()
                         tint = green
                         scene.physics.pause()
                         scene.add.text(15, 15, 'You hard work paid off!', {fill: 'lime', fontSize: '32px'})
                         scene.add.text(15, 40, 'Your resume was accepted!', {fill: 'lime', fontSize: '32px'})
                         dude.anims.play('fistpump', true)
                     } else {
+                        sndRip.play()
                         setTimeout(() => {
                             resume.destroy()
                             icon.destroy()
