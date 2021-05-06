@@ -12,10 +12,15 @@
 <body>
     
     <script>
+        const width = 500
+        const height = 500
+        const cWidth = width/2
+        const cHeight = height/2
+
         const config = {
             type: Phaser.AUTO,
-            width: 800,
-            height: 600,
+            width,
+            height,
             scene: {
                 preload,
                 create,
@@ -31,12 +36,31 @@
         }
         
         const game = new Phaser.Game(config)
+        let dude
+        let cursors
 
         function preload() {
+            cursors = this.input.keyboard.createCursorKeys()
+
+            this.load.spritesheet('dude', '/images/guy_typing_spritesheet_169_74_1.png', {frameWidth: 169, frameHeight: 74})
         }
         
         function create() {
-            
+            dude = this.add.sprite(cWidth, height - 35, 'dude')
+
+            this.anims.create({
+                key: 'typing',
+                frames: this.anims.generateFrameNumbers('dude', {start: 0, end: 1}),
+                frameRate: 10,
+                repeat: -1
+            })
+            this.anims.create({
+                key: 'nohope',
+                frames: this.anims.generateFrameNumbers('dude', {start: 2, end: 2}),
+            })
+
+            dude.anims.play('typing', true)
+
         }
         
         function update() {
