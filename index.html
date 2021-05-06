@@ -89,12 +89,16 @@ class HealthBar {
 
         let healthBar
 
+        let intervalId
+        let ms = 1000
+        let msMin = 100
+
         const sndPowerdown = new Audio('./audio/powerdown.wav')
-        const sndSpit = new Audio('./audio/spit.m4a')
         const sndBop = new Audio('./audio/bop.m4a')
         const sndRip = new Audio('./audio/rip.wav')
         const sndDing = new Audio('./audio/ding.wav')
         const sndWoohoo = new Audio('./audio/woohoo.wav')
+        const sndPiano = new Audio('./audio/piano.mp3')
 
         function preload() {
             cursors = this.input.keyboard.createCursorKeys()
@@ -131,16 +135,7 @@ class HealthBar {
                 icon.disableBody(true, true)
             })
 
-            //spawn icons
-            setInterval(() => {
-                const icon = icons.getFirstDead(false)
-                
-                const xPosStart = (Math.random() - 0.5 < 0) ? -25 : width + 25;
-                const xVel = (xPosStart === -25) ? Phaser.Math.Between(200, 400) : Phaser.Math.Between(-200, -400)
-
-                icon.enableBody(true, xPosStart, Phaser.Math.Between(35, height - 200), true, true)
-                icon.body.setVelocityX(xVel)
-            }, 100)
+            spawnIconsSetInterval(ms)
 
             //create animations for dude
             this.anims.create({
@@ -178,6 +173,24 @@ class HealthBar {
             disableUnseenIcons()
             if(!gameOver) checkActivity(this)
             inc++
+        }
+
+        function spawnIconsSetInterval(ms) {
+            intervalId = setInterval(() => {
+                const icon = icons.getFirstDead(false)
+                
+                const xPosStart = (Math.random() - 0.5 < 0) ? -25 : width + 25;
+                let xVel = (xPosStart === -25) ? Phaser.Math.Between(200, 400) : Phaser.Math.Between(-200, -400)
+
+                icon.enableBody(true, xPosStart, Phaser.Math.Between(35, height - 200), true, true)
+                if (icon.texture.key === 'mintbean' && ms !== msMin) {
+                    xVel *= 1.5
+                    icon.setScale(0.66)
+                } else {
+                    icon.setScale(1)
+                }
+                icon.body.setVelocityX(xVel)
+            }, ms)
         }
 
         function checkActivity(scene) {
@@ -237,6 +250,8 @@ class HealthBar {
                 resume.scene.physics.moveToObject(resume, target, 1000)
 
                 scene.physics.add.collider(resume, icons, function(resume, icon) {
+
+
                     const red = 0xff0000
                     const green = 0x00ff00
                     let tint = red
@@ -259,13 +274,27 @@ class HealthBar {
 
                         scene.add.text(15, 15, 'You hard work paid off!', {fill: 'lime', fontSize: '22px', backgroundColor: 'black'})
                         scene.add.text(15, 40, 'Your resume was accepted!', {fill: 'lime', fontSize: '22px', backgroundColor: 'black'})
-                        scene.add.text(15, 67, 'Click to replay!', {fill: 'white', fontSize: '22px', backgroundColor: 'black'})
+
+                        const key = icon.texture.key
+                        const firstLetter = key[0].toUpperCase()
+                        const otherLetters = key.substring(1, key.length)
+
+                        scene.add.text(15, 67, `${firstLetter + otherLetters} is interested!`, {fill: 'lime', fontSize: '22px', backgroundColor: 'black'})
+                        scene.add.text(15, 94, 'Click to replay!', {fill: 'white', fontSize: '22px', backgroundColor: 'black'})
 
 
                         dude.anims.play('fistpump', true)
 
                     } else {
-                        sndRip.play()
+                        if (icon.texture.key === 'mintbean' && ms !== msMin) {
+                            sndPiano.play()
+                            clearInterval(intervalId)
+                            const msHalf = Math.floor(ms/2)
+                            ms = msHalf > msMin ? msHalf : msMin
+                            spawnIconsSetInterval(ms)
+                        } else {
+                            sndRip.play()
+                        }
 
                         setTimeout(() => {
                             resume.destroy()
