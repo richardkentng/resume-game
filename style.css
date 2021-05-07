@@ -1,8 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Krona+One&display=swap');
+
 body {
     background: rgb(68, 68, 68);
 }
 
-.main-img {
-    max-width: 100%;
+h1, .linkedin, .github {
+    font-family: 'Krona One';
+    color: black;
 }
 
+.main-img, .profile-picture {
+    max-width: 100%;
+    border: 2px solid black;
+}
+.bg-black {
+    background-color: black;
+}
+
+.btn-play-game {
+    width: 300px;
+}
+
+@media (max-width: 576px) {
+    .profile-picture {
+        max-width: 200px;
+    }
+    .about-me {
+        margin-top: 10px;
+    }
+}
