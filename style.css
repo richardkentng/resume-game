@@ -4,14 +4,60 @@ body {
     background: rgb(68, 68, 68);
 }
 
-h1, .linkedin, .github {
+h1, .contact-link {
     font-family: 'Krona One';
     color: black;
 }
 
-.main-img, .profile-picture {
-    max-width: 100%;
-    border: 2px solid black;
+.contact-link {
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: rgb(254, 254, 254);
+    padding: 5px;
+}
+.contact-link:hover {
+    background-color: rgb(255, 249, 78);
+    color: rgb(208, 9, 208);
+    font-style: italic;
+}
+
+.icon-mintbean {
+    width: 30px;
+    padding: 5px;
+    filter: drop-shadow(2px 2px 1px rgba(0,0,0,0.9));
+    vertical-align: bottom;
+}
+
+.cont-contact-link {
+    border-radius: 5px;
+    background-color: rgb(112, 163, 139);
+    background: linear-gradient(0.25turn, rgb(112, 163, 139), rgb(117, 173, 52));
+    padding: 20px 0;
+}
+.main-img, .profile-picture, .img-most-creative {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px black;
+}
+
+.main-img:hover {
+    border: 2px solid rgb(63, 185, 63);
+}
+
+.img-most-creative:hover {
+    border: 4px solid rgb(103, 255, 240);
+    box-shadow: 0 0 7px #9809ff;
+}
+
+.text-fb-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gray-a {
+    color: #aaa;
 }
 
 .bg-black {
@@ -26,7 +72,7 @@ h1, .linkedin, .github {
     .profile-picture {
         max-width: 200px;
     }
-    .about-me {
-        margin-top: 10px;
+    .about-me,.most-creative-exp {
+        margin: 2rem 0;
     }
 }
